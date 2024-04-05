@@ -30,7 +30,7 @@
           doCheck = false;
 
           buildInputs = [ ];
-          nativeBuildInputs = [ ];
+          nativeBuildInputs = [ pkgs.pkg-config pkgs.cmake ];
         };
 
         deps_only = craneLib.buildDepsOnly common_args;
@@ -43,7 +43,8 @@
           nativeBuildInputs = with pkgs; [
             bacon
             toolchain
-          ];
+          ] ++ common_args.nativeBuildInputs ++ common_args.buildInputs;
+          WHISPER_DONT_GENERATE_BINDINGS = true;
         };
         packages = {
           default = crate;
