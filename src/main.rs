@@ -30,6 +30,12 @@ impl Debug for TranscribedSegment {
 struct Transcription(Vec<TranscribedSegment>);
 
 fn main() -> Result<()> {
+  color_eyre::install()?;
+  env_logger::Builder::from_env(
+    env_logger::Env::default().default_filter_or("info"),
+  )
+  .init();
+
   let args = Args::parse();
 
   let audio_file = args.path;
@@ -46,7 +52,7 @@ fn transcribe(audio_file: PathBuf) -> Result<Transcription> {
 
   let samples = self::audio::decode_audio_file_to_samples(audio_file)
     .wrap_err("failed to decode audio file")?;
-  println!("got {} audio samples", samples.len());
+  log::info!("got {} audio samples", samples.len());
 
   // create the whisper context
   let ctx = WhisperContext::new_with_params(
@@ -58,6 +64,7 @@ fn transcribe(audio_file: PathBuf) -> Result<Transcription> {
   // create the model params
   let mut model_params =
     FullParams::new(SamplingStrategy::Greedy { best_of: 0 });
+  model_params.set_n_threads(num_cpus::get() as _);
   model_params.set_print_special(false);
   model_params.set_print_progress(false);
   model_params.set_print_realtime(false);

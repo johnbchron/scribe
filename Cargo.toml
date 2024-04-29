@@ -6,6 +6,9 @@ edition = "2021"
 [dependencies]
 clap = { version = "4", features = [ "derive" ] }
 color-eyre = "0.6.3"
+env_logger = "0.11.3"
+log = "0.4.21"
+num_cpus = "1.16.0"
 rodio = { version = "0.17.3", features = [ "symphonia-all" ] }
 samplerate = "0.2.4"
-whisper-rs = { version = "0.10", features = [ ] }
+whisper-rs = { version = "0.11", features = [ ] }
