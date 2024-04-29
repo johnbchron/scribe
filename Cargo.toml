@@ -4,5 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-clap = { version = "4", features = ["derive"] }
-whisper-rs = "0.10"
+clap = { version = "4", features = [ "derive" ] }
+color-eyre = "0.6.3"
+rodio = { version = "0.17.3", features = [ "symphonia-all" ] }
+samplerate = "0.2.4"
+whisper-rs = { version = "0.10", features = [ ] }

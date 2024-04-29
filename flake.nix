@@ -19,6 +19,11 @@
           overlays = [ (import rust-overlay) ];
         };
 
+        whisper_model = pkgs.fetchurl {
+          url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small.en.bin?download=true";
+          hash = "sha256-xhONbVjsyDIgl+D5h8MvG+i7ChhTKj+I9zTRu/nEHl0=";
+        };
+
         toolchain = pkgs.rust-bin.selectLatestNightlyWith (toolchain: toolchain.default.override {
           extensions = [ "rust-src" "rust-analyzer" ];
         });
@@ -26,16 +31,20 @@
         craneLib = (crane.mkLib pkgs).overrideToolchain toolchain;
 
         common_args = {
-          src = ./.;
+          src = craneLib.cleanCargoSource (craneLib.path ./.);
           doCheck = false;
 
           buildInputs = [ ];
-          nativeBuildInputs = [ pkgs.pkg-config pkgs.cmake ];
+          nativeBuildInputs = with pkgs; [ pkg-config cmake alsa-lib rustPlatform.bindgenHook makeWrapper ];
         };
 
         deps_only = craneLib.buildDepsOnly common_args;
         crate = craneLib.buildPackage (common_args // {
           cargoArtifacts = deps_only;
+
+          postInstall = ''
+            wrapProgram $out/bin/scribe --set MODEL_PATH ${whisper_model}
+          '';
         });
 
       in {
