@@ -54,6 +54,7 @@
             toolchain
           ] ++ common_args.nativeBuildInputs ++ common_args.buildInputs;
           WHISPER_DONT_GENERATE_BINDINGS = true;
+          MODEL_PATH = whisper_model;
         };
         packages = {
           default = crate;
