@@ -2,6 +2,7 @@ mod audio;
 
 use std::{
   fmt::{self, Debug},
+  io::Write,
   path::PathBuf,
 };
 
@@ -38,9 +39,27 @@ fn main() -> Result<()> {
 
   let args = Args::parse();
 
+  use std::fs::File;
+  let mut output_file =
+    File::create_new("output.txt").wrap_err("failed to create output file")?;
+  let mut segments_file = File::create_new("segments.txt")
+    .wrap_err("failed to create segments file")?;
+
   let audio_file = args.path;
   let transcription = transcribe(audio_file)?;
-  dbg!(transcription.0);
+
+  write!(
+    output_file,
+    "{}",
+    transcription
+      .0
+      .iter()
+      .map(|s| s.text.clone())
+      .collect::<String>()
+  )
+  .wrap_err("failed to write to output file")?;
+  write!(segments_file, "{:#?}", transcription.0)
+    .wrap_err("failed to write to segments file")?;
 
   Ok(())
 }
